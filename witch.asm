@@ -98,25 +98,25 @@ calculate_screen_address:
 	or l				; combine what is already set in l into a, CCCccccc is set
 	ld l, a				; save in low byte
 
+	; one byte in screen memory contains 8 pixel. If x position is not divisble by 8 the bits need to be shifted right 
 	; Calculate pixel postion and store in A reg.
-	ld a, d
-	and %00000111
+	ld a, d				; load x into accumulator
+	and %00000111		; how often do we need to shift right
 
+	jr z, put_sprite_on_screen	; no need to shift if a is zero
 
-	jr z, putit			; no need to shift if a is zero
-
-	ld b, a				; make b our counter, how often ww'll need to shift
+	ld b, a				; make b our counter, how often we'll need to shift
 	ld a, 0				; a receives the shifted right hand part of the image
 
 shift:
 	srl c				; shift into carry
 	rra					; shift carry into a
-	djnz shift
+	djnz shift			; decrement counter in b, if it is not zero repeat shift
 
-putit:
+put_sprite_on_screen:
 	ld (hl), c
 	inc hl
-	ld (hl), d
+	ld (hl), a
 	ret
 
 ; Deployment: Snapshot
